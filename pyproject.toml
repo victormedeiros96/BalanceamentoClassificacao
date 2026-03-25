@@ -1,5 +1,5 @@
 [project]
-name = "balanceamento-classificacao"
+name = "balancer"
 version = "0.1.0"
 description = "Ferramenta para balanceamento inteligente de datasets de imagem para classificação."
 readme = "README.md"
@@ -7,7 +7,11 @@ authors = [
     { name = "victor Medeiros", email = "victormedeiros96@gmail.com" }
 ]
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "albumentations>=2.0.8",
+    "numpy>=2.4.3",
+    "opencv-python-headless>=4.0.0",
+]
 
 [build-system]
 requires = ["uv_build>=0.10.10,<0.11.0"]

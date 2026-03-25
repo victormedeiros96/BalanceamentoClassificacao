@@ -1,6 +1,9 @@
 import json
 import os
 import random
+import cv2
+import albumentations as A
+import numpy as np
 from pathlib import Path
 from typing import Dict, Any, List
 from .config import FolderBalanceConfig
@@ -24,6 +27,15 @@ class FolderImageDatasetBalancer:
         """
         self.config = config
         random.seed(self.config.random_seed)
+
+        self.aug_pipeline = self.config.augmentation_pipeline
+        if self.aug_pipeline is None:
+            self.aug_pipeline = A.Compose([
+                A.HorizontalFlip(p=0.5),
+                A.RandomBrightnessContrast(p=0.2),
+                A.ShiftScaleRotate(shift_limit=0.0625, scale_limit=0.1, rotate_limit=45, p=0.5),
+                A.GaussNoise(var_limit=(10.0, 50.0), p=0.2)
+            ])
 
     def run(self) -> Dict[str, Any]:
         """
@@ -137,4 +149,12 @@ class FolderImageDatasetBalancer:
                     base = Path(original_file).stem
                     dst_name = f"{base}_aug_{i}{ext}"
                     dst = os.path.join(output_cls_path, dst_name)
-                    process_file(src, dst, self.config.copy_instead_of_move)
+
+                    image = cv2.imread(src)
+                    if image is not None:
+                        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+                        augmented = self.aug_pipeline(image=image)["image"]
+                        augmented = cv2.cvtColor(augmented, cv2.COLOR_RGB2BGR)
+                        cv2.imwrite(dst, augmented)
+                    else:
+                        process_file(src, dst, self.config.copy_instead_of_move)

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Literal
+from typing import Literal, Any, Optional
 
 
 @dataclass
@@ -16,6 +16,7 @@ class FolderBalanceConfig:
         random_seed: Seed for reproducibility in random sampling.
         copy_instead_of_move: Whether to duplicate or move existing files.
         dry_run: If True, only calculations are done without modifying the disk.
+        augmentation_pipeline: An explicit Albumentations pipeline. If None, a default one provides geometric and color transformations.
     """
     input_root: str
     output_root: str
@@ -25,3 +26,4 @@ class FolderBalanceConfig:
     random_seed: int = 42
     copy_instead_of_move: bool = True
     dry_run: bool = False
+    augmentation_pipeline: Optional[Any] = None
